@@ -72,6 +72,10 @@ public class MdvneGipsIflyeAdapter {
 	public static void resetInit() {
 		init = false;
 		api.terminate();
+
+		// Workaround: also terminate the underlying eMoflon::IBeX-API (including the
+		// pattern matcher). This should be resolved in GIPS itself!
+		api.getEMoflonAPI().terminate();
 	}
 
 }
