@@ -1075,7 +1075,7 @@ public class ModelFacade {
 	 */
 	public void loadModel(final String path) {
 		checkStringValid(path);
-		final URI absPath = URI.createFileURI(System.getProperty("user.dir") + "/" + path);
+		final URI absPath = URI.createFileURI(path);
 		initRsFromFile(absPath);
 
 		// Restore other look-up data structures
@@ -1626,6 +1626,56 @@ public class ModelFacade {
 		// Remove server itself
 		getNetworkById(ssrv.getNetwork().getName()).getNodes().remove(ssrv);
 		EcoreUtil.delete(ssrv);
+	}
+
+	public void removeVirtualLink(String linkId) {
+		final Link link = getLinkById(linkId);
+		if (!(link instanceof VirtualLink)) {
+			throw new IllegalArgumentException("Given link is not a virtual link.");
+		}
+		VirtualLink vLink = (VirtualLink) link;
+		VirtualNetwork vNet = (VirtualNetwork) vLink.getNetwork();
+
+		// remove from virtual source and target node
+		vLink.getSource().getOutgoingLinks().remove(vLink);
+		vLink.getTarget().getIncomingLinks().remove(vLink);
+
+		// remove from host
+		if (vLink.getHost() != null) {
+			vLink.getHost().getGuestLinks().remove(vLink);
+		}
+
+		// remove from network
+		vNet.getLinks().remove(vLink);
+
+		EcoreUtil.delete(vLink);
+	}
+
+	public void removeVirtualSwitch(String switchId) {
+		final Node node = getNodeById(switchId);
+		if (!(node instanceof VirtualSwitch)) {
+			throw new IllegalArgumentException("Given id is not a virtual switch.");
+		}
+		VirtualSwitch vSwitch = (VirtualSwitch) node;
+
+		// remove from host
+		if (vSwitch.getHost() != null) {
+			vSwitch.getHost().getGuestSwitches().remove(vSwitch);
+		}
+
+		// remove all links starting or ending at switch
+		ArrayList<String> linksToRemove = new ArrayList<String>();
+		for (Link link : vSwitch.getOutgoingLinks()) {
+			linksToRemove.add(link.getName());
+		}
+		for (Link link : vSwitch.getIncomingLinks()) {
+			linksToRemove.add(link.getName());
+		}
+		for (String linkName : linksToRemove) {
+			removeVirtualLink(linkName);
+		}
+
+		EcoreUtil.delete(vSwitch);
 	}
 
 	/**
