@@ -1081,6 +1081,7 @@ public class ModelFacade {
 		// Restore other look-up data structures
 		this.links.clear();
 		this.paths.clear();
+		this.pathSourceMap.clear();
 		for (final Network n : getRoot().getNetworks()) {
 			// Links
 			for (final Link l : n.getLinks()) {
@@ -2246,7 +2247,7 @@ public class ModelFacade {
 		}
 
 		// Sanity check
-		if (minBw < 0) {
+		if (!ModelFacadeConfig.IGNORE_BW && minBw < 0) {
 			throw new InternalError("There was at least one substrate link with a residual bandwidth value < 0.");
 		}
 
