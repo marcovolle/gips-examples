@@ -156,7 +156,7 @@ rule linkPathMatchPositive {
 	# virtualLink.bandwidth <= substratePath.residualBandwidth
 	
 	// Explicitly exclude substrate paths with a residual bandwidth equals to 0
-	# substratePath.residualBandwidth > 0
+	//# substratePath.residualBandwidth > 0
 }
 when linkNotMapped
 
@@ -258,9 +258,9 @@ objective lpObj -> mapping::l2p {
 	self.nodes().virtualLink.bandwidth * self.nodes().substratePath.hops
 }
 
-constraint -> class::SubstratePath {
-	mappings.l2p->filter(match | match.nodes().substratePath == self)->sum(match | match.nodes().virtualLink.bandwidth) <= self.residualBandwidth
-}
+//constraint -> class::SubstratePath {
+//	mappings.l2p->filter(match | match.nodes().substratePath == self)->sum(match | match.nodes().virtualLink.bandwidth) <= self.residualBandwidth
+//}
 
 // Link 2 Server
 mapping l2s with linkServerMatchPositive;
